@@ -1,5 +1,4 @@
-Kanji|Just finished my project!||2024-12-08 15:02:42
-Kanji|Just finished my project!||2024-12-08 15:03:14
+
 hao|Hello, world!|https://example.com/hello.jpg|2024-12-08 15:52:48
 hao|Just finished my project!||2024-12-08 15:52:56
 hao|My first video|https://example.com/video.mp4|2024-12-08 15:53:14
