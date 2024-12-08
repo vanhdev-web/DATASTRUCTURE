@@ -10,6 +10,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Button = System.Windows.Forms.Button;
+using TextBox = System.Windows.Forms.TextBox;
 
 
 
@@ -203,13 +206,20 @@ namespace linkedlist_quanly
     {
         private TextBox txtUsername;
         private TextBox txtPassword;
-        private Button btnLogin;
-        private Button btnRegister;
-        private PictureBox picAvatar;
         private UserManager userManager;
 
         public string LoggedInUser { get; private set; }
 
+        private Image ResizeImage(Image img, int width, int height)
+        {
+            Bitmap resizedImage = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(resizedImage))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic; // Set high-quality interpolation
+                g.DrawImage(img, 0, 0, width, height);
+            }
+            return resizedImage;
+        }
         //Round form
         private void RoundedForm_Load(object sender, EventArgs e)
         {
@@ -223,7 +233,6 @@ namespace linkedlist_quanly
             path.CloseFigure();
             this.Region = new Region(path);
         }
-
         public LoginForm()
         {
             userManager = new UserManager();
@@ -240,58 +249,191 @@ namespace linkedlist_quanly
             this.MouseUp += new MouseEventHandler(Form1_MouseUp);
             // Enable double buffering
             this.DoubleBuffered = true;
+            //Change Cursor focus
+            this.Shown += new EventHandler(MainForm_Shown); // Use Shown event
         }
+        //Change cursor focus
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            // Set focus to the form itself or another control
+            this.ActiveControl = null; // This will remove focus from any control
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e); // Call the base method
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // Enable anti-aliasing
 
+            // Set up the font and brush for drawing text
+            Font drawFont = new Font("Arial", 13);
+            SolidBrush drawBrush = new SolidBrush(Color.Black);
+
+            // Define the position to draw the text
+            float y = 635F; // Center vertically in the form
+
+            // Measure the width of the text "or"
+            string text = "or";
+            SizeF textSize = e.Graphics.MeasureString(text, drawFont);
+            float textWidth = textSize.Width;
+
+            // Calculate the starting point for the lines
+            float lineY = y + drawFont.Height / 2; // Center the lines with respect to the text
+            float startX1 = (this.ClientSize.Width - textWidth) / 2 - 150; // Start point for the left line (longer)
+            float startX2 = (this.ClientSize.Width + textWidth) / 2 + 10; // Start point for the right line
+
+            // Set the pen color to grey
+            Pen greyPen = new Pen(Color.Gray);
+            // Draw the line before the text
+            e.Graphics.DrawLine(greyPen, startX1, lineY, startX1 + 140, lineY); // Line before "or" (longer)
+
+            // Draw the text "or"
+            e.Graphics.DrawString(text, drawFont, drawBrush, (this.ClientSize.Width - textWidth) / 2, y); // Draw the text "or"
+
+            // Draw the line after the text
+            e.Graphics.DrawLine(greyPen, startX2, lineY, startX2 + 140, lineY); // Line after "or" (longer)
+
+            // Add the text "4 sheep"
+            string sheepText = "Made by 4sheep";
+            Font sheepFont = new Font("Arial", 10); // Font size for "4 sheep"
+            SolidBrush sheepBrush = new SolidBrush(Color.Black); // Set text color to grey
+
+            // Measure the width of the text "4 sheep"
+            SizeF sheepTextSize = e.Graphics.MeasureString(sheepText, sheepFont);
+            float sheepTextWidth = sheepTextSize.Width;
+
+            // Define the position to draw "4 sheep"
+            float sheepY = 760; // Position below "or"
+
+            // Draw the text "4 sheep"
+            e.Graphics.DrawString(sheepText, sheepFont, sheepBrush, (this.ClientSize.Width - sheepTextWidth) / 2, sheepY); // Draw "4 sheep"
+
+            // Clean up resources
+            drawFont.Dispose();
+            drawBrush.Dispose();
+            greyPen.Dispose();
+            sheepFont.Dispose();
+            sheepBrush.Dispose();
+        }
         private void InitializeComponents()
         {
+
             this.Size = new Size(320, 650);
 
-            picAvatar = new PictureBox
+            RoundedPictureBox picAvatar = new RoundedPictureBox
             {
-                Size = new Size(80, 80),
-                Location = new Point(110, 10),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Image = Image.FromFile("Resources/default-avatar.png"),
-                BorderStyle = BorderStyle.FixedSingle
+                Size = new Size(270, 160),
+                Location = new Point(25, 70),
+                Image = ResizeImage(Image.FromFile("Resources/logo.png"), 270, 160),
+                SizeMode = PictureBoxSizeMode.CenterImage, // Adjust image to fit
+                BackColor = Color.Transparent // Optional: make background transparent
             };
 
 
             txtUsername = new TextBox
             {
-                Location = new Point(20, 300),
-                Size = new Size(280, 50)
+                Location = new Point(20, 240 ),
+                Multiline = true,
+                Size = new Size(280, 40),
+                Font = new Font("Arial", 35)
             };
+            System.Windows.Forms.Label lblUsernamePlaceholder = new System.Windows.Forms.Label
+            {
+                Text = "Nhập tên",
+                Location = new Point(25, 245),
+                Size = new Size(200, 30),
+                Font = new Font("Arial", 15),
+                ForeColor = Color.Gray,
+                BackColor = Color.White 
 
-
+            };
+            // Event handlers for Username TextBox
+            txtUsername.Enter += (s, e) => {
+                lblUsernamePlaceholder.Visible = false; // Hide placeholder when focused
+                
+            };
+            lblUsernamePlaceholder.Click += (s, e) =>
+            {
+                txtUsername.Focus();
+            };
+            txtUsername.Leave += (s, e) => {
+                if (string.IsNullOrEmpty(txtUsername.Text))
+                {
+                    lblUsernamePlaceholder.Visible = true; // Show placeholder if no text
+                }
+            };
             txtPassword = new TextBox
             {
-                Location = new Point(20, 260),
-                Size = new Size(280, 20),
+                Location = new Point(20, 300),
+                Multiline = true,
+                Size = new Size(280, 40),
+                Font = new Font("Arial", 35),
                 PasswordChar = '•'
             };
-
-            btnLogin = new Button
+            System.Windows.Forms.Label lblPasswordPlaceholder = new System.Windows.Forms.Label
             {
-                Text = "Đăng nhập",
-                Location = new Point(150, 90),
-                Size = new Size(150, 30)
+                Text = "Nhập mật khẩu",
+                Location = new Point(20, 305),
+                Size = new Size(200, 30),
+                Font = new Font("Arial", 15),
+                ForeColor = Color.Gray,
+                BackColor = Color.White
+
+            };
+            // Event handlers for Username TextBox
+            txtPassword.Enter += (s, e) => {
+                lblPasswordPlaceholder.Visible = false; // Hide placeholder when focused
+
+            };
+            lblPasswordPlaceholder.Click += (s, e) =>
+            {
+                txtPassword.Focus();
+            };
+            txtPassword.Leave += (s, e) => {
+                if (string.IsNullOrEmpty(txtPassword.Text))
+                {
+                    lblPasswordPlaceholder.Visible = true; // Show placeholder if no text
+                }
+            };
+            RoundedPictureBox btnLogin = new RoundedPictureBox
+            {
+                CornerRadius = 45,
+                DisplayText = "Đăng nhập",
+                BackColor = Color.FromArgb(255, 1, 95, 105),
+                TextStartX = (this.Width) / 2 - 28,
+                TextColor = Color.White, // Set the text color to 
+                TextFont = new Font("Georgia", 10, FontStyle.Regular), // Set the font style
+                Location = new Point(20, 355),
+                Size = new Size(280, 40),
+                
             };
             btnLogin.Click += BtnLogin_Click;
+            btnLogin.MouseEnter += (s, e) => btnLogin.BackColor = Color.FromArgb(255, 5, 115, 125); // Optional: hover effect
+            btnLogin.MouseLeave += (s, e) => btnLogin.BackColor = Color.FromArgb(255, 1, 95, 105); // Reset hover effect*/
 
-            btnRegister = new Button
+            RoundedPictureBox btnRegister = new RoundedPictureBox
             {
-                Text = "Đăng ký",
-                Location = new Point(120, 130),
-                Size = new Size(100, 30)
+                CornerRadius = 30,
+                DisplayText = "Đăng ký",
+                BackColor = Color.FromArgb(213, 111, 53), // Set the text color to 
+                TextStartX = (this.Width) / 2 - 38,
+                TextColor = Color.White, // Set the text color to 
+                TextFont = new Font("Georgia", 10, FontStyle.Regular), // Set the font style
+                Location = new Point(35, 550),
+                Size = new Size(250, 30),
+                
             };
             btnRegister.Click += BtnRegister_Click;
+            btnRegister.MouseEnter += (s, e) => btnRegister.BackColor = Color.FromArgb(255, 223, 131, 73); // Optional: hover effect
+            btnRegister.MouseLeave += (s, e) => btnRegister.BackColor = Color.FromArgb(213, 111, 53); // Reset hover effect*/
 
             this.Controls.AddRange(new Control[] {
-                 txtUsername,
-                txtPassword,
+                 lblUsernamePlaceholder, txtUsername,
+                lblPasswordPlaceholder, txtPassword,
                 btnLogin, btnRegister, 
                 picAvatar 
             });
+            // Initially show placeholders
+            lblUsernamePlaceholder.Visible = true;
+            lblPasswordPlaceholder.Visible = true;
 
         }
 
@@ -330,11 +472,11 @@ namespace linkedlist_quanly
                 string avatarPath = userManager.GetUserAvatar(txtUsername.Text);
                 try
                 {
-                    picAvatar.Image = Image.FromFile(avatarPath);
+                    //picAvatar.Image = Image.FromFile(avatarPath);
                 }
                 catch
                 {
-                    picAvatar.Image = Image.FromFile("Resources/default-avatar.png");
+                    //picAvatar.Image = Image.FromFile("Resources/default-avatar.png");
                 }
             }
         }

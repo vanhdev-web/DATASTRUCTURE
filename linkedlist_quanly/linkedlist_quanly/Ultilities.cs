@@ -114,7 +114,7 @@ public class CustomizedForm : Form
         }
     }
 
-    private void AdjustControlSizes(Control control)
+    public void AdjustControlSizes(Control control)
     {
         // Get the current DPI
         using (Graphics g = control.CreateGraphics())
