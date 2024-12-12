@@ -127,15 +127,15 @@ namespace linkedlist_quanly
             return postTime.ToString("dd/MM/yyyy HH:mm:ss");
         }
 
-        private void InitializeUI()
+        private void InitializeUI() 
         {
-            this.Size = new Size(320, 650);
+            this.Size = new Size(320, 650); 
 
             //Icon Social+ 
             System.Windows.Forms.Label app_name = new System.Windows.Forms.Label
             {
                 Text = "facebook",
-                ForeColor = Color.FromArgb(255, 1, 95, 105),
+                ForeColor = Color.FromArgb(255, 1, 95, 105), 
                 Location = new Point(3, 7),
                 Size = new Size(140, 40), // Kích thước cố định
                 Font = new Font("Inter", 20, FontStyle.Bold),
@@ -329,7 +329,6 @@ namespace linkedlist_quanly
         private void RefreshPosts()
         {
             postsPanel.Controls.Clear();
-
             // Lấy danh sách bài viết tùy theo chế độ xem
             var posts = isProfileView
                  ? postList.GetUserPosts(currentUser)
